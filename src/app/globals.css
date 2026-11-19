@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Panel oscuro por defecto (como la referencia), con modo claro si el sistema lo pide. */
+:root {
+  --bg: 13 12 20;
+  --panel: 22 20 33;
+  --panel2: 30 27 45;
+  --line: 44 40 64;
+  --ink: 236 234 245;
+  --muted: 150 145 172;
+  --accent: 157 116 255;
+  --ok: 74 210 140;
+  --warn: 245 178 70;
+  --bad: 255 104 104;
+  --font-sans: 'Manrope', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    --bg: 246 245 251; --panel: 255 255 255; --panel2: 240 238 248; --line: 225 221 238;
+    --ink: 26 22 42; --muted: 104 98 128; --accent: 116 70 230;
+    --ok: 22 140 84; --warn: 176 104 0; --bad: 205 50 50; color-scheme: light;
+  }
+}
+:root[data-theme='light'] {
+  --bg: 246 245 251; --panel: 255 255 255; --panel2: 240 238 248; --line: 225 221 238;
+  --ink: 26 22 42; --muted: 104 98 128; --accent: 116 70 230;
+  --ok: 22 140 84; --warn: 176 104 0; --bad: 205 50 50; color-scheme: light;
+}
+html, body { background: rgb(var(--bg)); color: rgb(var(--ink)); }
+body { font-family: var(--font-sans); font-size: 14px; -webkit-font-smoothing: antialiased; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 2px; }
+input, select, textarea {
+  background: rgb(var(--panel2)); border: 1px solid rgb(var(--line)); border-radius: 8px;
+  padding: 7px 10px; color: rgb(var(--ink)); font: inherit; min-width: 0;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: rgb(var(--accent)); }
+input[type='checkbox'] { accent-color: rgb(var(--accent)); width: 16px; height: 16px; padding: 0; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: rgb(var(--muted)); font-weight: 600; padding: 10px 12px; border-bottom: 1px solid rgb(var(--line)); white-space: nowrap; }
+td { padding: 10px 12px; border-bottom: 1px solid rgb(var(--line)); vertical-align: middle; }
+tr:last-child td { border-bottom: 0; }
+th.r, td.r { text-align: right; }
+@media (prefers-reduced-motion: no-preference) { .pulso { animation: pulso 1.6s ease-in-out infinite; } }
+@keyframes pulso { 50% { opacity: .5; } }

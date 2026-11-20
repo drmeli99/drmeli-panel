@@ -1,0 +1,377 @@
+<title>Instalar Panel MeLi</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: una columna de pasos con progreso arriba; cada paso es una tarjeta que se tilda. */
+:root {
+  --bg: #f6f5fb; --panel: #ffffff; --panel2: #f0eef8; --line: #e1ddee;
+  --ink: #1a162a; --muted: #686280; --accent: #7446e6; --accent-soft: #ece5fd;
+  --ok: #168c54; --ok-soft: #e0f3e9; --warn: #a86300; --warn-soft: #fdf0dc;
+  --f-ui: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d0c14; --panel: #161421; --panel2: #1e1b2d; --line: #2c2840;
+    --ink: #eceaf5; --muted: #9691ac; --accent: #9d74ff; --accent-soft: #2a2145;
+    --ok: #4ad28c; --ok-soft: #12291d; --warn: #f5b246; --warn-soft: #33260f; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d0c14; --panel: #161421; --panel2: #1e1b2d; --line: #2c2840;
+  --ink: #eceaf5; --muted: #9691ac; --accent: #9d74ff; --accent-soft: #2a2145;
+  --ok: #4ad28c; --ok-soft: #12291d; --warn: #f5b246; --warn-soft: #33260f; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font: 15px/1.55 var(--f-ui);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 780px; margin: 0 auto; display: grid; gap: 18px; }
+a { color: var(--accent); font-weight: 600; }
+code, .mono { font-family: var(--f-mono); font-size: 13px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header { padding-block: 32px 4px; display: grid; gap: 10px; }
+.marca { font-weight: 800; letter-spacing: .04em; font-size: 14px; }
+.marca span { font-size: 11px; letter-spacing: .2em; color: var(--muted); }
+h1 { margin: 0; font-size: clamp(26px, 5vw, 34px); line-height: 1.15; letter-spacing: -0.02em; text-wrap: balance; }
+.lead { margin: 0; color: var(--muted); max-width: 62ch; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--panel2); color: var(--muted); }
+
+.progreso { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 10px; display: grid; gap: 6px; }
+.progreso .fila { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); font-weight: 600; }
+.barra { height: 8px; border-radius: 99px; background: var(--panel2); overflow: hidden; }
+.barra i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width .3s; }
+
+.datos { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 12px; }
+.datos h2 { margin: 0; font-size: 17px; }
+.datos p { margin: 0; color: var(--muted); font-size: 14px; }
+label.campo { display: grid; gap: 6px; font-size: 13px; font-weight: 700; }
+input[type="text"] { width: 100%; min-width: 0; font: 14px var(--f-mono); padding: 9px 11px; border-radius: 9px; border: 1px solid var(--line); background: var(--panel2); color: var(--ink); }
+input[type="text"]:focus { outline: none; border-color: var(--accent); }
+
+.paso { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.paso.hecho { border-color: var(--ok); }
+.paso > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; padding: 16px 18px; }
+.paso > summary::-webkit-details-marker { display: none; }
+.n { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; background: var(--accent-soft); color: var(--accent); font-size: 14px; }
+.paso.hecho .n { background: var(--ok); color: var(--panel); }
+.paso h3 { margin: 0; font-size: 17px; line-height: 1.25; }
+.paso .sub { font-size: 13px; color: var(--muted); font-weight: 500; }
+.min { font-size: 12px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+.paso[open] .min::after { content: " ▴"; } .paso:not([open]) .min::after { content: " ▾"; }
+.cuerpo { padding: 0 18px 18px 64px; display: grid; gap: 12px; }
+@media (max-width: 560px) { .cuerpo { padding-left: 18px; } }
+.cuerpo ol { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+.cuerpo li { padding-left: 2px; }
+.cuerpo p { margin: 0; }
+.listo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 14px; padding: 10px 12px; border-radius: 10px; background: var(--panel2); cursor: pointer; width: fit-content; }
+.listo input { width: 18px; height: 18px; accent-color: var(--ok); }
+
+.copiar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.copiar .val { font-family: var(--f-mono); font-size: 13px; background: var(--panel2); border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; overflow-x: auto; white-space: nowrap; user-select: all; }
+.copiar .val.vacio { color: var(--muted); font-family: var(--f-ui); font-style: italic; user-select: none; }
+.btn { font: 600 13px var(--f-ui); padding: 8px 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; white-space: nowrap; }
+.btn:hover { border-color: var(--accent); }
+.btn.pri { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.ok { border-color: var(--ok); color: var(--ok); }
+
+.tabla { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.var { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 4px 14px; padding: 12px 14px; border-top: 1px solid var(--line); align-items: start; }
+.var:first-child { border-top: 0; }
+.var .nom { font-family: var(--f-mono); font-size: 13px; font-weight: 500; padding-top: 8px; overflow-wrap: anywhere; }
+.var .det { display: grid; gap: 6px; min-width: 0; }
+.var .det small { color: var(--muted); font-size: 12.5px; }
+@media (max-width: 560px) { .var { grid-template-columns: 1fr; } .var .nom { padding-top: 0; } }
+
+.nota { font-size: 13.5px; padding: 10px 12px; border-radius: 10px; background: var(--warn-soft); color: var(--ink); border-left: 3px solid var(--warn); }
+.tip { font-size: 13.5px; padding: 10px 12px; border-radius: 10px; background: var(--accent-soft); color: var(--ink); }
+.alertas { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.alertas li { background: var(--panel2); border-radius: 10px; padding: 10px 12px; font-size: 13.5px; }
+.alertas b { display: block; font-size: 13px; }
+
+.fin { text-align: center; padding: 22px; border-radius: 14px; background: var(--ok-soft); color: var(--ok); font-weight: 700; }
+.problemas { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 12px; }
+.problemas h2 { margin: 0; font-size: 17px; }
+.problemas dl { margin: 0; display: grid; gap: 12px; }
+.problemas dt { font-weight: 700; }
+.problemas dd { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+@media (prefers-reduced-motion: reduce) { .barra i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="marca">PANEL <span>MELI</span></div>
+    <h1>Instalá tu panel en 7 pasos</h1>
+    <p class="lead">Todo gratis: Vercel aloja la página, Neon guarda los datos y cron-job.org la despierta cada 5 minutos para mandarte las alertas. Se hace una sola vez, en unos 40 minutos. Tildá cada paso a medida que lo terminás.</p>
+    <div class="chips"><span class="chip">Repo: drmeli99/drmeli-panel</span><span class="chip">~40 min</span><span class="chip">$0 por mes</span></div>
+  </header>
+
+  <div class="progreso" aria-live="polite">
+    <div class="fila"><span id="progTxt">0 de 7 pasos</span><span id="progPct">0%</span></div>
+    <div class="barra"><i id="progBar"></i></div>
+  </div>
+
+  <section class="datos">
+    <h2>Tus datos para copiar y pegar</h2>
+    <p>Generá las claves acá y copialas a Vercel en el paso 2. Cuando tengas la dirección de tu panel, pegala abajo y se arman solas las direcciones de los pasos 3 y 5. Nada de esto sale de tu navegador.</p>
+    <label class="campo" for="url">Dirección de tu panel en Vercel (después del paso 2)
+      <input type="text" id="url" placeholder="https://drmeli-panel.vercel.app" autocomplete="off" spellcheck="false">
+    </label>
+    <label class="campo" for="cron">CRON_SECRET (el mismo que pusiste en Vercel)
+      <input type="text" id="cron" placeholder="Generalo con el botón del paso 2 o pegalo desde Vercel" autocomplete="off" spellcheck="false">
+    </label>
+  </section>
+
+  <details class="paso" data-paso="1" open>
+    <summary><span class="n">1</span><div><h3>Crear la base de datos</h3><div class="sub">Neon · donde se guardan ventas, costos y configuración</div></div><span class="min">5 min</span></summary>
+    <div class="cuerpo">
+      <ol>
+        <li>Entrá a <a href="https://neon.tech" target="_blank" rel="noreferrer">neon.tech</a> y creá una cuenta. Podés entrar con GitHub.</li>
+        <li>Tocá <b>Create project</b>. Nombre: <code>drmeli-panel</code>. Región: <b>AWS São Paulo</b>, la más cercana a Argentina.</li>
+        <li>En <b>Connection string</b> activá <b>Pooled connection</b> y copiá el texto que empieza con <code>postgresql://</code>. Guardalo: va en <code>DATABASE_URL</code> en el paso 2.</li>
+      </ol>
+      <p class="tip">Las tablas se crean solas la primera vez que abrís el panel. No tenés que hacer nada más en Neon.</p>
+      <label class="listo"><input type="checkbox" id="c1"> Listo, tengo el texto de Neon</label>
+    </div>
+  </details>
+
+  <details class="paso" data-paso="2">
+    <summary><span class="n">2</span><div><h3>Subir el panel a Vercel</h3><div class="sub">La página que abrís desde la compu o el celular</div></div><span class="min">10 min</span></summary>
+    <div class="cuerpo">
+      <ol>
+        <li>Entrá a <a href="https://vercel.com" target="_blank" rel="noreferrer">vercel.com</a> con tu cuenta de GitHub.</li>
+        <li><b>Add New → Project</b>, elegí <code>drmeli99/drmeli-panel</code> y tocá <b>Import</b>.</li>
+        <li>Antes de Deploy, abrí <b>Environment Variables</b> y cargá estas, una por una:</li>
+      </ol>
+      <div class="tabla">
+        <div class="var"><div class="nom">DATABASE_URL</div><div class="det"><small>El texto de Neon del paso 1.</small></div></div>
+        <div class="var"><div class="nom">APP_PASSWORD</div><div class="det"><small>La contraseña para entrar al panel. Inventá una larga y anotala.</small></div></div>
+        <div class="var"><div class="nom">AUTH_SECRET</div><div class="det">
+          <div class="copiar"><div class="val vacio" id="vAuth">Tocá Generar</div><button class="btn" type="button" data-copia="vAuth">Copiar</button></div>
+          <small>Protege tus tokens de MercadoLibre. Generalo una vez y no lo cambies.</small></div></div>
+        <div class="var"><div class="nom">CRON_SECRET</div><div class="det">
+          <div class="copiar"><div class="val vacio" id="vCron">Tocá Generar</div><button class="btn" type="button" data-copia="vCron">Copiar</button></div>
+          <small>La clave de las actualizaciones automáticas (paso 5).</small></div></div>
+        <div class="var"><div class="nom">MELI_CLIENT_ID</div><div class="det"><small>Por ahora poné <code>pendiente</code>. Lo cambiás en el paso 3.</small></div></div>
+        <div class="var"><div class="nom">MELI_CLIENT_SECRET</div><div class="det"><small>Por ahora poné <code>pendiente</code>.</small></div></div>
+        <div class="var"><div class="nom">APP_URL</div><div class="det"><small>Por ahora poné <code>pendiente</code>. Lo completás después del primer deploy.</small></div></div>
+      </div>
+      <button class="btn pri" type="button" id="generar" style="width:fit-content">Generar AUTH_SECRET y CRON_SECRET</button>
+      <ol start="4">
+        <li>Tocá <b>Deploy</b>. Al terminar, Vercel te muestra una dirección tipo <code>https://drmeli-panel.vercel.app</code>. Pegala arriba, en <b>Tus datos</b>.</li>
+        <li>En Vercel: <b>Settings → Environment Variables</b>, cambiá <code>APP_URL</code> por esa dirección (sin barra al final) y guardá.</li>
+      </ol>
+      <p class="nota">Copiá las dos claves generadas antes de cerrar esta página: no se guardan en ningún lado.</p>
+      <label class="listo"><input type="checkbox" id="c2"> Listo, el panel está en Vercel</label>
+    </div>
+  </details>
+
+  <details class="paso" data-paso="3">
+    <summary><span class="n">3</span><div><h3>Crear la app de MercadoLibre</h3><div class="sub">Una sola vez, sirve para todas tus tiendas</div></div><span class="min">8 min</span></summary>
+    <div class="cuerpo">
+      <ol>
+        <li>Entrá a <a href="https://developers.mercadolibre.com.ar" target="_blank" rel="noreferrer">developers.mercadolibre.com.ar</a> con tu cuenta principal → <b>Mis aplicaciones → Crear aplicación</b>.</li>
+        <li>En <b>URI de redirect</b> pegá esta dirección, exacta:
+          <div class="copiar" style="margin-top:6px"><div class="val vacio" id="vRedirect">Pegá la dirección de tu panel en “Tus datos”</div><button class="btn" type="button" data-copia="vRedirect">Copiar</button></div></li>
+        <li><b>Permisos:</b> lectura y escritura, y <b>acceso offline</b>. La escritura hace falta para responder preguntas y para las publicaciones masivas; el acceso offline, para que funcione solo sin que entres.</li>
+        <li>Guardá y copiá el <b>App ID</b> y la <b>Secret Key</b>.</li>
+        <li>En Vercel, cambiá <code>MELI_CLIENT_ID</code> por el App ID y <code>MELI_CLIENT_SECRET</code> por la Secret Key.</li>
+        <li>En Vercel: <b>Deployments</b> → los tres puntitos del último → <b>Redeploy</b>. Así toma todas las variables nuevas.</li>
+      </ol>
+      <label class="listo"><input type="checkbox" id="c3"> Listo, hice el Redeploy</label>
+    </div>
+  </details>
+
+  <details class="paso" data-paso="4">
+    <summary><span class="n">4</span><div><h3>Conectar tus tiendas</h3><div class="sub">Una vez por cada cuenta de MercadoLibre</div></div><span class="min">3 min</span></summary>
+    <div class="cuerpo">
+      <ol>
+        <li>Abrí tu panel y entrá con tu <code>APP_PASSWORD</code>.</li>
+        <li>Andá a <b>Configuración → + Conectar tienda</b>, entrá con la cuenta de la tienda y tocá <b>Permitir</b>.</li>
+        <li><b>Para la segunda tienda:</b> cerrá sesión en mercadolibre.com.ar en ese navegador y repetí. MeLi te va a pedir el usuario de la otra tienda.</li>
+      </ol>
+      <p class="tip">La primera vez trae los últimos 30 días de ventas y tarda unos minutos. Mientras tanto el Overview muestra “Cargando el historial”.</p>
+      <label class="listo"><input type="checkbox" id="c4"> Listo, mis tiendas están conectadas</label>
+    </div>
+  </details>
+
+  <details class="paso" data-paso="5">
+    <summary><span class="n">5</span><div><h3>Que se actualice solo</h3><div class="sub">cron-job.org · cada 5 minutos y cada hora</div></div><span class="min">5 min</span></summary>
+    <div class="cuerpo">
+      <p>Vercel gratis no puede correr tareas cada 5 minutos. <a href="https://cron-job.org" target="_blank" rel="noreferrer">cron-job.org</a> (gratis) llama a tu panel para que revise ventas, envíos y preguntas, y te mande las alertas.</p>
+      <ol>
+        <li>Creá una cuenta y tocá <b>Create cronjob</b>.</li>
+        <li>En <b>URL</b> pegá esta dirección y elegí <b>Every 5 minutes</b>:
+          <div class="copiar" style="margin-top:6px"><div class="val vacio" id="vRapido">Completá la dirección y el CRON_SECRET en “Tus datos”</div><button class="btn" type="button" data-copia="vRapido">Copiar</button></div></li>
+        <li>Creá otro cronjob con esta dirección y elegí <b>Every hour</b>:
+          <div class="copiar" style="margin-top:6px"><div class="val vacio" id="vLento">Completá la dirección y el CRON_SECRET en “Tus datos”</div><button class="btn" type="button" data-copia="vLento">Copiar</button></div></li>
+      </ol>
+      <p class="nota">Estas direcciones llevan tu clave. No las compartas con nadie.</p>
+      <p class="tip">Para comprobar que anda: en el historial de cron-job.org cada ejecución tiene que decir <b>200</b>. Si dice <b>401</b>, el CRON_SECRET de la dirección no es el mismo que el de Vercel.</p>
+      <label class="listo"><input type="checkbox" id="c5"> Listo, creé los dos cronjobs</label>
+    </div>
+  </details>
+
+  <details class="paso" data-paso="6">
+    <summary><span class="n">6</span><div><h3>Activar las alertas</h3><div class="sub">Telegram, WhatsApp y email</div></div><span class="min">7 min</span></summary>
+    <div class="cuerpo">
+      <p>Se cargan en el panel, en <b>Configuración → Canales</b>. Abajo de todo tocá <b>Guardar cambios</b> y después <b>Mandar alerta de prueba</b>.</p>
+      <p><b>Telegram</b> (recomendado: te llega todo al instante)</p>
+      <ol>
+        <li>En Telegram escribile a <b>@BotFather</b> el mensaje <code>/newbot</code> y elegí un nombre. Te da un <b>token</b>.</li>
+        <li>Abrí tu bot nuevo y mandale “hola”.</li>
+        <li>Abrí en el navegador <code>https://api.telegram.org/botTU_TOKEN/getUpdates</code> (con tu token en lugar de TU_TOKEN). Buscá <code>"chat":{"id":</code> y copiá ese número: es el <b>chat id</b>.</li>
+      </ol>
+      <p><b>WhatsApp</b>: seguí los pasos de <a href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank" rel="noreferrer">CallMeBot</a> (gratis) para conseguir tu apikey. Por WhatsApp te llega solo lo urgente.</p>
+      <p><b>Email</b> (opcional): creá una cuenta gratis en <a href="https://resend.com" target="_blank" rel="noreferrer">resend.com</a>, generá una API key, cargala en Vercel como <code>RESEND_API_KEY</code> y hacé Redeploy. Sin dominio propio solo manda al email con el que te registraste.</p>
+      <p><b>Qué te avisa:</b></p>
+      <ul class="alertas">
+        <li><b>🛵 Venta Flex nueva</b>Si sale hoy o mañana según tu hora de corte.</li>
+        <li><b>⏰ Recordatorios</b>A las horas que elijas, con lo que hay que despachar hoy.</li>
+        <li><b>🚨 Antes del corte</b>En la última hora, cada 15 min por todos los canales.</li>
+        <li><b>❌ Pasó el corte</b>Si quedaron Flex sin salir.</li>
+        <li><b>❓ Preguntas</b>Cada pregunta nueva, y otra vez si pasa 1 hora sin respuesta.</li>
+        <li><b>⚠️ Reclamos</b>Cada reclamo o mediación nueva.</li>
+        <li><b>📦 Stock bajo</b>Una vez por día.</li>
+        <li><b>🎯 Competencia</b>Si perdés el catálogo o un competidor cambia precios.</li>
+        <li><b>📊 Resumen</b>Ventas, ganancia y pendientes del día, a las 21:00.</li>
+      </ul>
+      <p class="tip">En <b>Configuración → Flex y despachos</b> poné tu hora de corte Flex, igual a la que tenés en MercadoLibre. Viene en 13:00.</p>
+      <label class="listo"><input type="checkbox" id="c6"> Listo, me llegó la alerta de prueba</label>
+    </div>
+  </details>
+
+  <details class="paso" data-paso="7">
+    <summary><span class="n">7</span><div><h3>Cargar tus costos</h3><div class="sub">Para ver la ganancia real de cada venta</div></div><span class="min">variable</span></summary>
+    <div class="cuerpo">
+      <ol>
+        <li>En el panel, entrá a <b>Productos y costos</b>.</li>
+        <li>Cargá el costo de cada producto en la tabla, o pegá muchos de una vez desde Excel o Google Sheets: una fila por producto, con el <b>SKU</b> (o el código MLA) y el <b>costo</b>.</li>
+        <li>Si pagás IIBB o retenciones, poné el porcentaje en <b>Configuración → Impuestos</b>.</li>
+        <li>En el celular: abrí el panel → <b>Agregar a pantalla de inicio</b>. Queda como una app.</li>
+      </ol>
+      <p class="tip">Ganancia = venta − comisión de MeLi − envío que pagás − impuestos − costo del producto.</p>
+      <label class="listo"><input type="checkbox" id="c7"> Listo, cargué mis costos</label>
+    </div>
+  </details>
+
+  <div class="fin" id="fin" hidden>Panel instalado. A partir de ahora te avisa solo.</div>
+
+  <section class="problemas">
+    <h2>Si algo no anda</h2>
+    <dl>
+      <div><dt>“No se pudo conectar” al volver de MercadoLibre</dt><dd>La URI de redirect de tu app de MeLi tiene que ser exactamente la del paso 3, y <code>APP_URL</code> en Vercel la misma dirección del panel, sin barra al final.</dd></div>
+      <div><dt>Aparece un error rojo en una tienda</dt><dd>Casi siempre se arregla desconectándola en Configuración y volviéndola a conectar.</dd></div>
+      <div><dt>Publicidad o Competencia muestran un error de MercadoLibre</dt><dd>MeLi cambia seguido esas partes de su API. Mandame el mensaje exacto y lo ajusto.</dd></div>
+      <div><dt>El panel no se actualiza solo</dt><dd>Mirá el historial de cron-job.org: tiene que decir 200. Si dice 401, revisá el CRON_SECRET.</dd></div>
+      <div><dt>Cambié una variable en Vercel y no pasa nada</dt><dd>Después de cambiar variables hay que hacer <b>Redeploy</b>.</dd></div>
+    </dl>
+  </section>
+</div>
+
+<script>
+(function () {
+  var TOTAL = 7;
+  function leer(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function guardar(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  // Progreso
+  function progreso() {
+    var n = 0;
+    for (var i = 1; i <= TOTAL; i++) {
+      var c = document.getElementById('c' + i);
+      var p = document.querySelector('.paso[data-paso="' + i + '"]');
+      p.classList.toggle('hecho', c.checked);
+      if (c.checked) n++;
+    }
+    var pct = Math.round(n / TOTAL * 100);
+    document.getElementById('progTxt').textContent = n + ' de ' + TOTAL + ' pasos';
+    document.getElementById('progPct').textContent = pct + '%';
+    document.getElementById('progBar').style.width = pct + '%';
+    document.getElementById('fin').hidden = n < TOTAL;
+  }
+  for (var i = 1; i <= TOTAL; i++) {
+    (function (i) {
+      var c = document.getElementById('c' + i);
+      c.checked = leer('guia_c' + i) === '1';
+      c.addEventListener('change', function () {
+        guardar('guia_c' + i, c.checked ? '1' : '0');
+        progreso();
+        if (c.checked) {
+          var sig = document.querySelector('.paso[data-paso="' + (i + 1) + '"]');
+          document.querySelector('.paso[data-paso="' + i + '"]').open = false;
+          if (sig) { sig.open = true; sig.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        }
+      });
+    })(i);
+  }
+  // Abrir el primer paso sin terminar
+  for (var j = 1; j <= TOTAL; j++) {
+    var pj = document.querySelector('.paso[data-paso="' + j + '"]');
+    pj.open = !document.getElementById('c' + j).checked && !document.querySelector('.paso[open]:not([data-paso="' + j + '"])');
+  }
+  progreso();
+
+  // Claves aleatorias
+  function clave() {
+    var a = new Uint8Array(24);
+    (window.crypto || window.msCrypto).getRandomValues(a);
+    return Array.prototype.map.call(a, function (b) { return ('0' + b.toString(16)).slice(-2); }).join('');
+  }
+  function poner(id, texto) {
+    var el = document.getElementById(id);
+    el.textContent = texto;
+    el.classList.remove('vacio');
+  }
+  document.getElementById('generar').addEventListener('click', function () {
+    poner('vAuth', clave());
+    var cron = clave();
+    poner('vCron', cron);
+    document.getElementById('cron').value = cron;
+    armar();
+    this.textContent = 'Generar otras';
+  });
+
+  // Direcciones armadas
+  var url = document.getElementById('url'), cronIn = document.getElementById('cron');
+  url.value = leer('guia_url') || '';
+  function base() {
+    var u = url.value.trim().replace(/\/+$/, '');
+    if (u && !/^https?:\/\//.test(u)) u = 'https://' + u;
+    return u;
+  }
+  function armar() {
+    var b = base(), k = cronIn.value.trim();
+    var r = document.getElementById('vRedirect');
+    if (b) poner('vRedirect', b + '/api/meli/callback');
+    else { r.textContent = 'Pegá la dirección de tu panel en “Tus datos”'; r.classList.add('vacio'); }
+    ['vRapido', 'vLento'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (b && k) poner(id, b + '/api/cron/' + (id === 'vRapido' ? 'rapido' : 'lento') + '?key=' + encodeURIComponent(k));
+      else { el.textContent = 'Completá la dirección y el CRON_SECRET en “Tus datos”'; el.classList.add('vacio'); }
+    });
+  }
+  url.addEventListener('input', function () { guardar('guia_url', url.value.trim()); armar(); });
+  cronIn.addEventListener('input', armar);
+  armar();
+
+  // Copiar
+  document.querySelectorAll('[data-copia]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var el = document.getElementById(btn.getAttribute('data-copia'));
+      if (el.classList.contains('vacio')) return;
+      var txt = el.textContent;
+      function ok() { btn.textContent = 'Copiado'; btn.classList.add('ok'); setTimeout(function () { btn.textContent = 'Copiar'; btn.classList.remove('ok'); }, 1600); }
+      function seleccionar() { var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Seleccionado: Ctrl+C'; }
+      try { navigator.clipboard.writeText(txt).then(ok, seleccionar); } catch (e) { seleccionar(); }
+    });
+  });
+})();
+</script>

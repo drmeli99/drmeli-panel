@@ -135,7 +135,7 @@ function SinBase({ error }: { error: string }) {
     <div className="flex flex-col gap-3">
       <h1 className="text-2xl font-bold">Falta configurar la base de datos</h1>
       <Aviso tono="bad">{error}</Aviso>
-      <p className="text-muted">Revisá la variable <code>DATABASE_URL</code> en Vercel (paso 2 de la guía) y volvé a implementar.</p>
+      <p className="text-muted">En Vercel: tu proyecto → <b>Storage → Create Database → Neon</b> → conectalo al proyecto y hacé <b>Redeploy</b>.</p>
     </div>
   );
 }

@@ -4,6 +4,7 @@
  */
 import { db } from './db';
 import { cifrar, descifrar } from './cripto';
+import { appUrl } from './entorno';
 
 export const MELI_API = process.env.MELI_API_BASE || 'https://api.mercadolibre.com';
 const MELI_AUTH = process.env.MELI_AUTH_BASE || 'https://auth.mercadolibre.com.ar/authorization';
@@ -31,7 +32,7 @@ function resumenError(b: unknown): string {
 }
 
 export function redirectUri() {
-  return `${(process.env.APP_URL || '').replace(/\/$/, '')}/api/meli/callback`;
+  return `${appUrl()}/api/meli/callback`;
 }
 
 export function linkAutorizacion(state: string) {

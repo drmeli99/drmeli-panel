@@ -13,66 +13,58 @@ Lo que vas a tener:
 - **Publicaciones masivas**: cambiar precio, stock o estado de muchas publicaciones a la vez, y copiar publicaciones a otra tienda.
 - **Alertas** por Telegram, email y WhatsApp.
 
-Todo gratis: Vercel (la página), Neon (la base de datos) y cron-job.org (lo que la despierta cada 5 minutos).
+Todo gratis: Vercel (la página y la base de datos) y cron-job.org (lo que la despierta cada 5 minutos).
 
-Tiempo: unos 40 minutos, una sola vez.
+Tiempo: unos 30 minutos, una sola vez. También está esta guía como página interactiva en `guia.html`.
 
 ---
 
-## 1. Base de datos (Neon)
-
-1. Entrá a [neon.tech](https://neon.tech) y creá una cuenta (podés entrar con GitHub).
-2. **Create project**. Nombre: `panel-meli`. Región: **AWS São Paulo** (la más cercana).
-3. En **Connection string** activá **Pooled connection** y copiá el texto que empieza con `postgresql://…`. Es tu `DATABASE_URL`.
-
-Las tablas se crean solas la primera vez que abrís el panel.
-
-## 2. Subir la app a Vercel
+## 1. Subir la app a Vercel
 
 1. Entrá a [vercel.com](https://vercel.com) con tu cuenta de GitHub.
-2. **Add New → Project** → elegí el repositorio del panel → **Import**.
+2. **Add New → Project** → elegí `drmeli99/drmeli-panel` → **Import**.
 3. Antes de tocar Deploy, abrí **Environment Variables** y cargá:
 
 | Nombre | Valor |
 |---|---|
-| `DATABASE_URL` | El texto de Neon del paso 1 |
 | `APP_PASSWORD` | La contraseña para entrar al panel (elegí una larga) |
-| `AUTH_SECRET` | Un texto largo y aleatorio, de 32 caracteres o más. Podés generar uno en [1password.com/password-generator](https://1password.com/password-generator) |
-| `CRON_SECRET` | Otro texto aleatorio, distinto del anterior |
-| `MELI_CLIENT_ID` | Lo completás en el paso 3 (por ahora poné `pendiente`) |
-| `MELI_CLIENT_SECRET` | Ídem |
-| `APP_URL` | Lo completás después del primer deploy |
+| `AUTH_SECRET` | Un texto largo y aleatorio, de 32 caracteres o más. No lo cambies nunca después |
+| `MELI_CLIENT_ID` | Por ahora `pendiente` (lo completás en el paso 3) |
+| `MELI_CLIENT_SECRET` | Por ahora `pendiente` |
 
-4. **Deploy**. Al terminar, Vercel te da una dirección tipo `https://panel-meli-xxxx.vercel.app`.
-5. Volvé a **Settings → Environment Variables**, poné esa dirección en `APP_URL` (sin barra al final) y guardá.
+4. **Deploy**. Al terminar, Vercel te da la dirección de tu panel, tipo `https://drmeli-panel.vercel.app`.
 
-## 3. App de MercadoLibre (una sola vez, sirve para todas tus tiendas)
+## 2. Base de datos (desde Vercel)
+
+1. En tu proyecto de Vercel, pestaña **Storage → Create Database → Neon** (Serverless Postgres) → **Continue**. Región **São Paulo**, plan **Free**.
+2. Conectala al proyecto `drmeli-panel`. Vercel carga sola la conexión.
+3. **Deployments → los tres puntitos del último → Redeploy**.
+
+Las tablas se crean solas la primera vez que abrís el panel.
+
+## 3. App de MercadoLibre (una sola vez, sirve para todas las tiendas)
 
 1. Entrá a [developers.mercadolibre.com.ar](https://developers.mercadolibre.com.ar) con tu cuenta principal → **Mis aplicaciones → Crear aplicación**.
-2. **URI de redirect**: `https://TU-APP.vercel.app/api/meli/callback` (con tu dirección real).
+2. **URI de redirect**: `https://TU-PANEL.vercel.app/api/meli/callback` (con tu dirección real; también figura en Configuración del panel).
 3. **Permisos**: lectura y escritura, y **acceso offline**. La escritura hace falta para responder preguntas y para las publicaciones masivas.
 4. Guardá y copiá el **App ID** y la **Secret Key**.
-5. En Vercel cargalos en `MELI_CLIENT_ID` y `MELI_CLIENT_SECRET`.
-6. En Vercel, **Deployments → los tres puntitos del último → Redeploy**, para que tome todas las variables.
+5. En Vercel cambiá `MELI_CLIENT_ID` y `MELI_CLIENT_SECRET` por esos valores y hacé **Redeploy**.
 
 ## 4. Conectar tus tiendas
 
 1. Abrí tu panel y entrá con `APP_PASSWORD`.
 2. **Configuración → + Conectar tienda** → entrá con la cuenta de la tienda → **Permitir**.
-3. **Para la segunda tienda:** cerrá sesión en mercadolibre.com.ar en ese navegador y repetí. MeLi te pide el usuario de la otra tienda.
+3. **Para la segunda tienda:** cerrá sesión en mercadolibre.com.ar en ese navegador y repetí.
 
 La primera vez trae los últimos 30 días de ventas; tarda unos minutos.
 
 ## 5. Que se actualice solo (cron-job.org)
 
-Vercel gratis no puede correr tareas cada 5 minutos, así que lo despierta [cron-job.org](https://cron-job.org) (gratis):
+1. Creá una cuenta en [cron-job.org](https://cron-job.org) (gratis).
+2. En el panel, **Configuración → Actualización automática** muestra tus dos direcciones, ya armadas con tu clave.
+3. En cron-job.org: **Create cronjob** con la primera dirección, **Every 5 minutes**. Otro con la segunda, **Every hour**.
 
-1. Creá una cuenta y tocá **Create cronjob**.
-2. En el panel, en **Configuración → Actualización automática**, copiá la primera dirección (`…/api/cron/rapido?key=…`).
-3. En cron-job.org: pegala en **URL** y elegí **Every 5 minutes**. Guardá.
-4. Creá otro cronjob con la segunda dirección (`…/api/cron/lento?key=…`) y elegí **Every hour**.
-
-Esas direcciones llevan tu `CRON_SECRET`: no las compartas.
+Esas direcciones llevan tu clave: no las compartas.
 
 ## 6. Alertas
 
@@ -111,8 +103,10 @@ Abrí el panel en el celular → **Agregar a pantalla de inicio**. Queda como un
 
 ## Si algo no anda
 
-- **"No se pudo conectar" al volver de MeLi:** la URI de redirect de tu app de MeLi tiene que ser exactamente `https://TU-APP.vercel.app/api/meli/callback`, y `APP_URL` tiene que ser la misma dirección, sin barra al final.
+- **"No se pudo conectar" al volver de MeLi:** la URI de redirect de tu app de MeLi tiene que ser exactamente la que figura en Configuración del panel.
 - **Sale un error rojo en una tienda:** casi siempre se arregla desconectándola y volviéndola a conectar.
 - **Publicidad o Competencia muestran un error de MercadoLibre:** MeLi cambia esas partes de su API seguido. Mandame el mensaje exacto y lo ajusto.
-- **El panel no se actualiza solo:** en cron-job.org fijate en el historial que los dos cronjobs respondan **200**. Si dicen **401**, la clave de la dirección no coincide con `CRON_SECRET`.
+- **El panel no se actualiza solo:** en cron-job.org fijate en el historial que los dos cronjobs respondan **200**. Si dicen **401**, copiá de nuevo las direcciones desde Configuración.
 - **Cambié una variable en Vercel y no hace nada:** hay que hacer **Redeploy**.
+- **Dice "Falta la base de datos":** falta el paso 2 o el Redeploy después de crearla.
+- **Uso un dominio propio:** agregá `APP_URL` con tu dominio (sin barra final) y actualizá la URI de redirect en MeLi.

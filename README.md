@@ -18,4 +18,4 @@ npm run dev
 - `src/lib/sync.ts`: sincronización (ventas, envíos, preguntas, reclamos, publicaciones).
 - `src/lib/alertas.ts`: alertas por Telegram, Resend y CallMeBot, sin repetir.
 - `src/lib/competencia.ts`, `src/lib/publicidad.ts`, `src/lib/masivo.ts`: competencia, Product Ads y acciones masivas.
-- `/api/cron/rapido` (cada 5 min) y `/api/cron/lento` (cada hora), protegidos con `CRON_SECRET`.
+- `/api/cron/rapido` (cada 5 min) y `/api/cron/lento` (cada hora), protegidos con una clave (CRON_SECRET o derivada de AUTH_SECRET).

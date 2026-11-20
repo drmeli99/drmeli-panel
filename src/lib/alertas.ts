@@ -5,6 +5,7 @@ import { operacionTotal } from './sync';
 import { resumenVentas } from './ventas';
 import { fechaAR, minutosAR, diaSemanaAR, hhmm, diaLindo, tiempo, plata } from './tiempo';
 import type { Pendiente } from './tipos';
+import { appUrl } from './entorno';
 
 const MAX = 10;
 type Msg = { urgente: boolean; titulo: string; texto: string };
@@ -151,7 +152,7 @@ function lineas<T>(l: T[], fn: (x: T) => string) {
 export const esc = (s: unknown) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 export const corto = (s: unknown, n: number) => { const x = String(s ?? ''); return x.length > n ? x.slice(0, n - 1) + '…' : x; };
 function linkPanel(ruta: string, txt: string) {
-  const base = (process.env.APP_URL || '').replace(/\/$/, '');
+  const base = appUrl();
   return base.startsWith('https://') ? `\n<a href="${base}${ruta}">${txt}</a>` : '';
 }
 

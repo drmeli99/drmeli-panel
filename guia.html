@@ -109,8 +109,8 @@ input[type="text"]:focus { outline: none; border-color: var(--accent); }
   <header>
     <div class="marca">PANEL <span>MELI</span></div>
     <h1>Instalá tu panel en 7 pasos</h1>
-    <p class="lead">Todo gratis: Vercel aloja la página, Neon guarda los datos y cron-job.org la despierta cada 5 minutos para mandarte las alertas. Se hace una sola vez, en unos 40 minutos. Tildá cada paso a medida que lo terminás.</p>
-    <div class="chips"><span class="chip">Repo: drmeli99/drmeli-panel</span><span class="chip">~40 min</span><span class="chip">$0 por mes</span></div>
+    <p class="lead">Todo gratis: Vercel aloja la página y la base de datos, y cron-job.org la despierta cada 5 minutos para mandarte las alertas. Se hace una sola vez, en unos 30 minutos. Tildá cada paso a medida que lo terminás.</p>
+    <div class="chips"><span class="chip">Repo: drmeli99/drmeli-panel</span><span class="chip">~30 min</span><span class="chip">$0 por mes</span></div>
   </header>
 
   <div class="progreso" aria-live="polite">
@@ -120,56 +120,48 @@ input[type="text"]:focus { outline: none; border-color: var(--accent); }
 
   <section class="datos">
     <h2>Tus datos para copiar y pegar</h2>
-    <p>Generá las claves acá y copialas a Vercel en el paso 2. Cuando tengas la dirección de tu panel, pegala abajo y se arman solas las direcciones de los pasos 3 y 5. Nada de esto sale de tu navegador.</p>
-    <label class="campo" for="url">Dirección de tu panel en Vercel (después del paso 2)
+    <p>Cuando Vercel te dé la dirección de tu panel (paso 1), pegala acá y se arma sola la dirección que va en MercadoLibre (paso 3). Nada de esto sale de tu navegador.</p>
+    <label class="campo" for="url">Dirección de tu panel en Vercel
       <input type="text" id="url" placeholder="https://drmeli-panel.vercel.app" autocomplete="off" spellcheck="false">
-    </label>
-    <label class="campo" for="cron">CRON_SECRET (el mismo que pusiste en Vercel)
-      <input type="text" id="cron" placeholder="Generalo con el botón del paso 2 o pegalo desde Vercel" autocomplete="off" spellcheck="false">
     </label>
   </section>
 
   <details class="paso" data-paso="1" open>
-    <summary><span class="n">1</span><div><h3>Crear la base de datos</h3><div class="sub">Neon · donde se guardan ventas, costos y configuración</div></div><span class="min">5 min</span></summary>
-    <div class="cuerpo">
-      <ol>
-        <li>Entrá a <a href="https://neon.tech" target="_blank" rel="noreferrer">neon.tech</a> y creá una cuenta. Podés entrar con GitHub.</li>
-        <li>Tocá <b>Create project</b>. Nombre: <code>drmeli-panel</code>. Región: <b>AWS São Paulo</b>, la más cercana a Argentina.</li>
-        <li>En <b>Connection string</b> activá <b>Pooled connection</b> y copiá el texto que empieza con <code>postgresql://</code>. Guardalo: va en <code>DATABASE_URL</code> en el paso 2.</li>
-      </ol>
-      <p class="tip">Las tablas se crean solas la primera vez que abrís el panel. No tenés que hacer nada más en Neon.</p>
-      <label class="listo"><input type="checkbox" id="c1"> Listo, tengo el texto de Neon</label>
-    </div>
-  </details>
-
-  <details class="paso" data-paso="2">
-    <summary><span class="n">2</span><div><h3>Subir el panel a Vercel</h3><div class="sub">La página que abrís desde la compu o el celular</div></div><span class="min">10 min</span></summary>
+    <summary><span class="n">1</span><div><h3>Subir el panel a Vercel</h3><div class="sub">La página que abrís desde la compu o el celular</div></div><span class="min">8 min</span></summary>
     <div class="cuerpo">
       <ol>
         <li>Entrá a <a href="https://vercel.com" target="_blank" rel="noreferrer">vercel.com</a> con tu cuenta de GitHub.</li>
         <li><b>Add New → Project</b>, elegí <code>drmeli99/drmeli-panel</code> y tocá <b>Import</b>.</li>
-        <li>Antes de Deploy, abrí <b>Environment Variables</b> y cargá estas, una por una:</li>
+        <li>Antes de Deploy, abrí <b>Environment Variables</b> y cargá estas cuatro:</li>
       </ol>
       <div class="tabla">
-        <div class="var"><div class="nom">DATABASE_URL</div><div class="det"><small>El texto de Neon del paso 1.</small></div></div>
         <div class="var"><div class="nom">APP_PASSWORD</div><div class="det"><small>La contraseña para entrar al panel. Inventá una larga y anotala.</small></div></div>
         <div class="var"><div class="nom">AUTH_SECRET</div><div class="det">
           <div class="copiar"><div class="val vacio" id="vAuth">Tocá Generar</div><button class="btn" type="button" data-copia="vAuth">Copiar</button></div>
-          <small>Protege tus tokens de MercadoLibre. Generalo una vez y no lo cambies.</small></div></div>
-        <div class="var"><div class="nom">CRON_SECRET</div><div class="det">
-          <div class="copiar"><div class="val vacio" id="vCron">Tocá Generar</div><button class="btn" type="button" data-copia="vCron">Copiar</button></div>
-          <small>La clave de las actualizaciones automáticas (paso 5).</small></div></div>
+          <small>Protege tus datos de MercadoLibre. Generalo una vez y no lo cambies nunca.</small></div></div>
         <div class="var"><div class="nom">MELI_CLIENT_ID</div><div class="det"><small>Por ahora poné <code>pendiente</code>. Lo cambiás en el paso 3.</small></div></div>
         <div class="var"><div class="nom">MELI_CLIENT_SECRET</div><div class="det"><small>Por ahora poné <code>pendiente</code>.</small></div></div>
-        <div class="var"><div class="nom">APP_URL</div><div class="det"><small>Por ahora poné <code>pendiente</code>. Lo completás después del primer deploy.</small></div></div>
       </div>
-      <button class="btn pri" type="button" id="generar" style="width:fit-content">Generar AUTH_SECRET y CRON_SECRET</button>
+      <button class="btn pri" type="button" id="generar" style="width:fit-content">Generar AUTH_SECRET</button>
       <ol start="4">
-        <li>Tocá <b>Deploy</b>. Al terminar, Vercel te muestra una dirección tipo <code>https://drmeli-panel.vercel.app</code>. Pegala arriba, en <b>Tus datos</b>.</li>
-        <li>En Vercel: <b>Settings → Environment Variables</b>, cambiá <code>APP_URL</code> por esa dirección (sin barra al final) y guardá.</li>
+        <li>Tocá <b>Deploy</b>. Al terminar, Vercel te muestra la dirección de tu panel, tipo <code>https://drmeli-panel.vercel.app</code>. Pegala arriba, en <b>Tus datos</b>.</li>
       </ol>
-      <p class="nota">Copiá las dos claves generadas antes de cerrar esta página: no se guardan en ningún lado.</p>
-      <label class="listo"><input type="checkbox" id="c2"> Listo, el panel está en Vercel</label>
+      <p class="nota">Copiá el AUTH_SECRET a Vercel antes de cerrar esta página: no se guarda en ningún lado.</p>
+      <label class="listo"><input type="checkbox" id="c1"> Listo, el panel está en Vercel</label>
+    </div>
+  </details>
+
+  <details class="paso" data-paso="2">
+    <summary><span class="n">2</span><div><h3>Crear la base de datos</h3><div class="sub">Desde Vercel, con unos clics</div></div><span class="min">3 min</span></summary>
+    <div class="cuerpo">
+      <ol>
+        <li>En Vercel, abrí tu proyecto y andá a la pestaña <b>Storage</b>.</li>
+        <li><b>Create Database → Neon</b> (Serverless Postgres) → <b>Continue</b>. Región: <b>São Paulo</b>, la más cercana. Plan: <b>Free</b>.</li>
+        <li>Cuando te pregunte, conectala a tu proyecto <code>drmeli-panel</code>. Vercel carga sola la conexión.</li>
+        <li>Andá a <b>Deployments</b> → los tres puntitos del último → <b>Redeploy</b>.</li>
+      </ol>
+      <p class="tip">Las tablas se crean solas la primera vez que abrís el panel. Si entrás y ves “Falta la base de datos”, es que falta el Redeploy.</p>
+      <label class="listo"><input type="checkbox" id="c2"> Listo, la base está conectada</label>
     </div>
   </details>
 
@@ -183,7 +175,7 @@ input[type="text"]:focus { outline: none; border-color: var(--accent); }
         <li><b>Permisos:</b> lectura y escritura, y <b>acceso offline</b>. La escritura hace falta para responder preguntas y para las publicaciones masivas; el acceso offline, para que funcione solo sin que entres.</li>
         <li>Guardá y copiá el <b>App ID</b> y la <b>Secret Key</b>.</li>
         <li>En Vercel, cambiá <code>MELI_CLIENT_ID</code> por el App ID y <code>MELI_CLIENT_SECRET</code> por la Secret Key.</li>
-        <li>En Vercel: <b>Deployments</b> → los tres puntitos del último → <b>Redeploy</b>. Así toma todas las variables nuevas.</li>
+        <li>En Vercel: <b>Deployments</b> → los tres puntitos del último → <b>Redeploy</b>. Así toma las variables nuevas.</li>
       </ol>
       <label class="listo"><input type="checkbox" id="c3"> Listo, hice el Redeploy</label>
     </div>
@@ -208,13 +200,12 @@ input[type="text"]:focus { outline: none; border-color: var(--accent); }
       <p>Vercel gratis no puede correr tareas cada 5 minutos. <a href="https://cron-job.org" target="_blank" rel="noreferrer">cron-job.org</a> (gratis) llama a tu panel para que revise ventas, envíos y preguntas, y te mande las alertas.</p>
       <ol>
         <li>Creá una cuenta y tocá <b>Create cronjob</b>.</li>
-        <li>En <b>URL</b> pegá esta dirección y elegí <b>Every 5 minutes</b>:
-          <div class="copiar" style="margin-top:6px"><div class="val vacio" id="vRapido">Completá la dirección y el CRON_SECRET en “Tus datos”</div><button class="btn" type="button" data-copia="vRapido">Copiar</button></div></li>
-        <li>Creá otro cronjob con esta dirección y elegí <b>Every hour</b>:
-          <div class="copiar" style="margin-top:6px"><div class="val vacio" id="vLento">Completá la dirección y el CRON_SECRET en “Tus datos”</div><button class="btn" type="button" data-copia="vLento">Copiar</button></div></li>
+        <li>En tu panel, abrí <b>Configuración → Actualización automática</b>. Ahí están tus dos direcciones, ya armadas con tu clave.</li>
+        <li>En cron-job.org pegá la primera en <b>URL</b> y elegí <b>Every 5 minutes</b>. Guardá.</li>
+        <li>Creá otro cronjob con la segunda dirección y elegí <b>Every hour</b>.</li>
       </ol>
       <p class="nota">Estas direcciones llevan tu clave. No las compartas con nadie.</p>
-      <p class="tip">Para comprobar que anda: en el historial de cron-job.org cada ejecución tiene que decir <b>200</b>. Si dice <b>401</b>, el CRON_SECRET de la dirección no es el mismo que el de Vercel.</p>
+      <p class="tip">Para comprobar que anda: en el historial de cron-job.org cada ejecución tiene que decir <b>200</b>. Si dice <b>401</b>, volvé a copiar las direcciones desde Configuración.</p>
       <label class="listo"><input type="checkbox" id="c5"> Listo, creé los dos cronjobs</label>
     </div>
   </details>
@@ -267,10 +258,10 @@ input[type="text"]:focus { outline: none; border-color: var(--accent); }
   <section class="problemas">
     <h2>Si algo no anda</h2>
     <dl>
-      <div><dt>“No se pudo conectar” al volver de MercadoLibre</dt><dd>La URI de redirect de tu app de MeLi tiene que ser exactamente la del paso 3, y <code>APP_URL</code> en Vercel la misma dirección del panel, sin barra al final.</dd></div>
+      <div><dt>“No se pudo conectar” al volver de MercadoLibre</dt><dd>La URI de redirect de tu app de MeLi tiene que ser exactamente la que figura en Configuración del panel (la misma del paso 3).</dd></div>
       <div><dt>Aparece un error rojo en una tienda</dt><dd>Casi siempre se arregla desconectándola en Configuración y volviéndola a conectar.</dd></div>
       <div><dt>Publicidad o Competencia muestran un error de MercadoLibre</dt><dd>MeLi cambia seguido esas partes de su API. Mandame el mensaje exacto y lo ajusto.</dd></div>
-      <div><dt>El panel no se actualiza solo</dt><dd>Mirá el historial de cron-job.org: tiene que decir 200. Si dice 401, revisá el CRON_SECRET.</dd></div>
+      <div><dt>El panel no se actualiza solo</dt><dd>Mirá el historial de cron-job.org: tiene que decir 200. Si dice 401, copiá de nuevo las direcciones desde Configuración.</dd></div>
       <div><dt>Cambié una variable en Vercel y no pasa nada</dt><dd>Después de cambiar variables hay que hacer <b>Redeploy</b>.</dd></div>
     </dl>
   </section>
@@ -332,15 +323,11 @@ input[type="text"]:focus { outline: none; border-color: var(--accent); }
   }
   document.getElementById('generar').addEventListener('click', function () {
     poner('vAuth', clave());
-    var cron = clave();
-    poner('vCron', cron);
-    document.getElementById('cron').value = cron;
-    armar();
-    this.textContent = 'Generar otras';
+    this.textContent = 'Generar otra';
   });
 
   // Direcciones armadas
-  var url = document.getElementById('url'), cronIn = document.getElementById('cron');
+  var url = document.getElementById('url');
   url.value = leer('guia_url') || '';
   function base() {
     var u = url.value.trim().replace(/\/+$/, '');
@@ -348,18 +335,12 @@ input[type="text"]:focus { outline: none; border-color: var(--accent); }
     return u;
   }
   function armar() {
-    var b = base(), k = cronIn.value.trim();
+    var b = base();
     var r = document.getElementById('vRedirect');
     if (b) poner('vRedirect', b + '/api/meli/callback');
     else { r.textContent = 'Pegá la dirección de tu panel en “Tus datos”'; r.classList.add('vacio'); }
-    ['vRapido', 'vLento'].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (b && k) poner(id, b + '/api/cron/' + (id === 'vRapido' ? 'rapido' : 'lento') + '?key=' + encodeURIComponent(k));
-      else { el.textContent = 'Completá la dirección y el CRON_SECRET en “Tus datos”'; el.classList.add('vacio'); }
-    });
   }
   url.addEventListener('input', function () { guardar('guia_url', url.value.trim()); armar(); });
-  cronIn.addEventListener('input', armar);
   armar();
 
   // Copiar

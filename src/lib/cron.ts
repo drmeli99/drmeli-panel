@@ -1,4 +1,5 @@
 import { igualSeguro } from './cripto';
+import { cronSecret } from './entorno';
 import { sincronizarRapido, sincronizarLento } from './sync';
 import { syncCompetencia, syncVigilancia } from './competencia';
 import { syncPublicidad } from './publicidad';
@@ -6,7 +7,7 @@ import { procesarAlertas } from './alertas';
 import { getEstado, setEstado } from './db';
 
 export function cronAutorizado(req: Request) {
-  const secreto = process.env.CRON_SECRET || '';
+  const secreto = cronSecret();
   if (!secreto) return false;
   const h = req.headers.get('authorization') || '';
   const k = new URL(req.url).searchParams.get('key') || '';

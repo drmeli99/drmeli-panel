@@ -3,6 +3,7 @@ import { getConfig } from '@/lib/config';
 import { listaCuentas } from '@/lib/datos';
 import { getEstado } from '@/lib/db';
 import { redirectUri } from '@/lib/meli';
+import { appUrl, cronSecret, faltantes } from '@/lib/entorno';
 import { hace } from '@/lib/tiempo';
 import { Encabezado, Tarjeta, Aviso, Boton, PuntoRep, nivelRep, Vacio } from '@/components/ui';
 import { FormConfig, ProbarAlertas, Copiar } from '@/components/FormConfig';
@@ -14,9 +15,9 @@ export default async function Configuracion({ searchParams }: { searchParams: Pr
   const sp = await searchParams;
   const [cfg, cs, op] = await Promise.all([getConfig(), listaCuentas(), getEstado('lento:paso')]);
   const h = await headers();
-  const base = (process.env.APP_URL || `https://${h.get('host')}`).replace(/\/$/, '');
-  const faltan = ['DATABASE_URL', 'APP_PASSWORD', 'AUTH_SECRET', 'CRON_SECRET', 'MELI_CLIENT_ID', 'MELI_CLIENT_SECRET', 'APP_URL'].filter((k) => !process.env[k]);
-  const key = process.env.CRON_SECRET || 'TU_CRON_SECRET';
+  const base = appUrl() || `https://${h.get('host')}`;
+  const faltan = faltantes();
+  const key = cronSecret() || 'FALTA_AUTH_SECRET';
   return (
     <>
       <Encabezado icono={I.config} titulo="Configuración">
@@ -24,7 +25,7 @@ export default async function Configuracion({ searchParams }: { searchParams: Pr
       </Encabezado>
       {sp.conectada && <Aviso tono="ok">✅ {sp.conectada} conectada. En unos minutos aparecen sus ventas y publicaciones.</Aviso>}
       {sp.error && <Aviso tono="bad">No se pudo conectar: {sp.error}</Aviso>}
-      {faltan.length > 0 && <Aviso tono="bad">Faltan variables de entorno en Vercel: <b>{faltan.join(', ')}</b>. Ver GUIA.md, paso 3.</Aviso>}
+      {faltan.length > 0 && <Aviso tono="bad">Falta configurar en Vercel: <b>{faltan.join(', ')}</b>. Después de cargarlo, hacé Redeploy.</Aviso>}
 
       <Tarjeta titulo="Tiendas de MercadoLibre" accion={<Boton href="/api/meli/connect" tono="pri">+ Conectar tienda</Boton>}>
         {cs.length ? (

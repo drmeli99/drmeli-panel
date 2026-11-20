@@ -1,4 +1,5 @@
 import postgres from 'postgres';
+import { databaseUrl } from './entorno';
 
 declare global {
   // eslint-disable-next-line no-var
@@ -8,10 +9,11 @@ declare global {
 }
 
 function client() {
-  if (!process.env.DATABASE_URL) throw new Error('Falta DATABASE_URL (ver GUIA.md)');
+  const url = databaseUrl();
+  if (!url) throw new Error('Falta la base de datos. En Vercel: Storage → Create Database → Neon, y después Redeploy.');
   if (!global.__sql) {
-    const local = /localhost|127\.0\.0\.1/.test(process.env.DATABASE_URL);
-    global.__sql = postgres(process.env.DATABASE_URL, {
+    const local = /localhost|127\.0\.0\.1/.test(url);
+    global.__sql = postgres(url, {
       max: 3,
       idle_timeout: 20,
       prepare: false, // compatible con poolers (Neon/Supabase)
